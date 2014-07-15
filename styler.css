@@ -1,0 +1,43 @@
+body {
+    background: #00011a;
+}
+
+body circle {
+    stroke: #000;
+    fill-opacity: .9;
+}
+
+body #legend {
+    padding: 1.5em 0 0 1.5em;
+    margin-top: -2em;
+    margin-bottom: 2em;
+}
+
+body #legend ul {
+    list-style: none;
+    font-weight: bold;
+    position: absolute;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0.5em;
+    border-radius: 20px;
+}
+
+body #legend ul li.key {
+    border-top-width: 15px;
+    border-top-style: solid;
+    font-size: .75em;
+    width: 40px;
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+    display: inline-block;
+    position: relative;
+}
+
+body #legend ul li.key:first-child {
+    margin-left: 1em;
+}
+
+body g {
+    font-weight: bold;
+}
