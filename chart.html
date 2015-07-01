@@ -1,0 +1,87 @@
+<html>
+<head>
+	<link rel="stylesheet" href="styler.css">
+</head>
+<body>
+	<div id="legend"></div>
+	<div id="bubbly"></div>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script src='http://d3js.org/d3.v2.js'></script>
+	<script>var r = 800,
+    format = d3.format(",d");
+
+var bubble = d3.layout.pack()
+    .sort(null)
+    .size([r, r]);
+
+var vis = d3.select("#bubbly").append("svg:svg")
+    .attr("width", r)
+    .attr("height", r)
+    .attr("class", "bubble");
+
+d3.json("data.json", function(json) {
+  var colors =['rgb(255,255,204)','rgb(199,233,180)','rgb(127,205,187)','rgb(65,182,196)','rgb(44,127,184)','rgb(37,52,148)'];
+  var sampleset = json.words;
+  var colorRange = d3.scale.quantile()
+    .range(colors)
+    .domain([0, 6, d3.max(sampleset, function(d) {
+      return (d.length);
+  })]);
+  var textRange = d3.scale.linear()
+      .range([1,35])
+      .domain([d3.min(sampleset, function(d) {
+              return (d.occurrence);
+      }), d3.max(sampleset, function(d) {
+          return (d.occurrence);
+      })])
+  
+  var legend = d3.select('#legend')
+  .append('ul')
+  .text("Word Size")
+    .attr('class', 'list-inline');
+
+  var keys = legend.selectAll('li.key')
+    .data(colorRange.range());
+  
+    var node = vis.selectAll("g.node")
+      .data(bubble.nodes(classes(json))
+      .filter(function(d) { return !d.children; }))
+    .enter().append("svg:g")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+  keys.enter().append('li')
+    .attr('class', 'key')
+    .style('border-top-color', String)
+  .text(function(d,i) {if(d3.round(colorRange.quantiles()[i-1])) {return d3.round(colorRange.quantiles()[i-1])}
+                      else { return 1}}
+    );
+
+  node.append("svg:title")
+      .text(function(d) { return d.className + ": " + format(d.value); });
+
+  node.append("svg:circle")
+      .attr("r", function(d) { return d.r; })
+      .style("fill", function(d) {return colorRange (d.color)});
+
+ node.append("svg:text")
+      .attr("text-anchor", "middle")
+      .attr("dy", ".3em")
+     .style("font-size",function(d) {return textRange (d.value) + "px"})
+ .text(function(d) {return d.className;} );
+});
+
+
+function classes(root) {
+  var classes = [];
+
+  function recurse(name, node) {
+    if (node.words) node.words.forEach(function(word) { recurse(node.name, word); });
+    else classes.push({className: node.word, value: node.occurrence, color: node.length});
+  }
+
+  recurse(null, root);
+  return {children: classes};
+}</script>
+</body>
+</html>
